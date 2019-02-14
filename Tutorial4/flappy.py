@@ -1,5 +1,5 @@
 import arcade
-from models import World
+from models import World,Player
  
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -17,7 +17,20 @@ class ModelSprite(arcade.Sprite):
     def draw(self):
         self.sync_with_model()
         super().draw()
+
+class PillarPairSprite():
+    def __init__(self, model):
+        self.model = model
  
+        self.top_pillar_sprite = arcade.Sprite('images/pillar-top.png')
+        self.bottom_pillar_sprite = arcade.Sprite('images/pillar-bottom.png')
+
+    def draw(self):
+        self.top_pillar_sprite.set_position(self.model.x, self.model.y + 400)
+        self.top_pillar_sprite.draw()
+ 
+        self.bottom_pillar_sprite.set_position(self.model.x, self.model.y - 400)
+        self.bottom_pillar_sprite.draw()
  
 class FlappyDotWindow(arcade.Window):
     def __init__(self, width, height):
@@ -27,7 +40,15 @@ class FlappyDotWindow(arcade.Window):
  
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
  
-        self.dot_sprite = ModelSprite('images/dot.png', model=self.world.player)
+        self.dot_sprite = ModelSprite('images/1.png', model=self.world.player)
+
+        self.pillar_pair_sprite = PillarPairSprite(model=self.world.pillar_pair)
+    
+    def on_key_press(self, key, key_modifiers):
+        if not self.world.is_started():
+            self.world.start()
+ 
+        self.world.on_key_press(key, key_modifiers)
  
     def update(self, delta):
         self.world.update(delta)
@@ -36,6 +57,12 @@ class FlappyDotWindow(arcade.Window):
         arcade.start_render()
  
         self.dot_sprite.draw()
+        self.pillar_pair_sprite.draw()
+
+        arcade.draw_text(str(self.world.score),
+                         self.width - 30, self.height - 30,
+                         arcade.color.BLACK, 20)
+
  
  
 def main():
