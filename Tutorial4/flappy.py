@@ -38,11 +38,15 @@ class FlappyDotWindow(arcade.Window):
  
         arcade.set_background_color(arcade.color.WHITE)
  
+        self.start()
+
+    def start(self):
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
  
         self.dot_sprite = ModelSprite('images/1.png', model=self.world.player)
 
-        self.pillar_pair_sprite = PillarPairSprite(model=self.world.pillar_pair)
+        self.pillar_pair_sprites = [PillarPairSprite(model=self.world.pillar_pairs[0]),PillarPairSprite(model=self.world.pillar_pairs[1])]
+
     
     def on_key_press(self, key, key_modifiers):
         if not self.world.is_started():
@@ -52,12 +56,15 @@ class FlappyDotWindow(arcade.Window):
  
     def update(self, delta):
         self.world.update(delta)
+        if self.world.is_dead() :
+            self.start()
  
     def on_draw(self):
         arcade.start_render()
  
         self.dot_sprite.draw()
-        self.pillar_pair_sprite.draw()
+        for pillar_pair_sprite in self.pillar_pair_sprites :
+            pillar_pair_sprite.draw()
 
         arcade.draw_text(str(self.world.score),
                          self.width - 30, self.height - 30,

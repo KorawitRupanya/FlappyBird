@@ -18,6 +18,9 @@ class Player:
     def update(self, delta):
         self.y += self.vy
         self.vy -= Player.GRAVITY
+    
+    def togkob(self):
+        return self.y==0 or self.y ==600
 
 class PillarPair:
     PILLAR_SPEED = 5
@@ -47,13 +50,14 @@ class World:
     STATE_STARTED = 2
     STATE_DEAD = 3
 
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
+        self.pillar_pairs = [PillarPair(self, width - 100, height // 2),PillarPair(self, width + 350, height // 2)]
         
         self.player = Player(self, width // 2, height // 2)
         self.state = World.STATE_FROZEN
-        self.pillar_pair = PillarPair(self, width - 100, height // 2)
         self.score = 0
  
     def update(self, delta):
@@ -61,10 +65,17 @@ class World:
             return
  
         self.player.update(delta)
-        self.pillar_pair.update(delta)
- 
-        if self.pillar_pair.hit(self.player):
+        if(self.player.togkob()):
             self.die()
+
+        for pillar_pair in self.pillar_pairs :
+            pillar_pair.update(delta)
+
+            if pillar_pair.x == self.player.x :
+                self.score +=1 
+
+            if pillar_pair.hit(self.player):
+                self.die()
     
     def on_key_press(self, key, key_modifiers):
         self.player.jump()
@@ -83,3 +94,4 @@ class World:
  
     def is_dead(self):
         return self.state == World.STATE_DEAD
+
